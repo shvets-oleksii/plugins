@@ -9,6 +9,8 @@ import android.media.EncoderProfiles;
 import android.media.MediaRecorder;
 import android.os.Build;
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+
 import java.io.IOException;
 
 public class MediaRecorderBuilder {
@@ -33,8 +35,10 @@ public class MediaRecorderBuilder {
   }
 
   public MediaRecorderBuilder(
-      @NonNull EncoderProfiles encoderProfiles, @NonNull String outputFilePath) {
-    this(encoderProfiles, outputFilePath, new MediaRecorderFactory());
+          @Nullable EncoderProfiles encoderProfiles,
+          @Nullable CamcorderProfile camcorderProfile,
+          @NonNull String outputFilePath) {
+    this(encoderProfiles, camcorderProfile, outputFilePath, new MediaRecorderFactory());
   }
 
   MediaRecorderBuilder(
@@ -48,12 +52,13 @@ public class MediaRecorderBuilder {
   }
 
   MediaRecorderBuilder(
-      @NonNull EncoderProfiles encoderProfiles,
+      @Nullable EncoderProfiles encoderProfiles,
+      @Nullable CamcorderProfile camcorderProfile,
       @NonNull String outputFilePath,
       MediaRecorderFactory helper) {
     this.outputFilePath = outputFilePath;
     this.encoderProfiles = encoderProfiles;
-    this.camcorderProfile = null;
+    this.camcorderProfile = camcorderProfile;
     this.recorderFactory = helper;
   }
 
@@ -75,7 +80,7 @@ public class MediaRecorderBuilder {
     if (enableAudio) mediaRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
     mediaRecorder.setVideoSource(MediaRecorder.VideoSource.SURFACE);
 
-    if (Build.VERSION.SDK_INT >= 31) {
+    if (Build.VERSION.SDK_INT >= 31 && encoderProfiles != null) {
       EncoderProfiles.VideoProfile videoProfile = encoderProfiles.getVideoProfiles().get(0);
       EncoderProfiles.AudioProfile audioProfile = encoderProfiles.getAudioProfiles().get(0);
 
